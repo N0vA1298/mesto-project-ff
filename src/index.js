@@ -10,6 +10,10 @@ const popupProfileEdit = document.querySelector('.popup_type_edit');
 const addNewCardButton = document.querySelector('.profile__add-button');
 const popupNewCard = document.querySelector('.popup_type_new-card');
 const popupTypeImage = document.querySelector('.popup_type_image');
+const popupInputCardName = popupNewCard.querySelector('.popup__input_type_card-name');
+const popupInputCardUrl = popupNewCard.querySelector('.popup__input_type_url');
+const popupImage = document.querySelector('.popup__image');
+const popupCaption = document.querySelector('.popup__caption');
 
 // добавление карточки на страницу
 
@@ -24,8 +28,9 @@ editButtonProfile.addEventListener('click', openEditProfile);
 
 addNewCardButton.addEventListener('click', function() {
   openModal(popupNewCard);
-  popupNewCard.addEventListener('submit', addNewCard);
 });
+
+popupNewCard.addEventListener('submit', addNewCard);
 
 // открытие редактирования профиля
 
@@ -58,17 +63,14 @@ function editProfileInfo(evt) {
 
 // слушатель на submit формы
 
-const popupSubmitForm = document.querySelector('.popup__form');
+const profileForm = document.querySelector('.popup__form');
 
-popupSubmitForm.addEventListener('submit', editProfileInfo);
+profileForm.addEventListener('submit', editProfileInfo);
 
 // функция добавления новой карточки
 
 function addNewCard(evt) {
   evt.preventDefault();
-
-  const popupInputCardName = popupNewCard.querySelector('.popup__input_type_card-name');
-  const popupInputCardUrl = popupNewCard.querySelector('.popup__input_type_url');
 
   const popupInputCardNameValue = popupInputCardName.value;
   const popupInputCardUrlValue = popupInputCardUrl.value;
@@ -96,9 +98,6 @@ function openImagePopup(evt) {
 
   const cardImage = card.querySelector('.card__image');
   const cardTitle = card.querySelector('.card__title');
-
-  const popupImage = document.querySelector('.popup__image');
-  const popupCaption = document.querySelector('.popup__caption');
 
   popupImage.src = cardImage.src;
   popupImage.alt = cardImage.alt;
