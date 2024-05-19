@@ -1,8 +1,10 @@
-// @todo: Темплейт карточки
+import './pages/index.css';
+import {initialCards} from './cards.js';
 
-// @todo: DOM узлы
 
 const placesList = document.querySelector('.places__list');
+
+const editButtonProfile = document.querySelector('.profile__edit-button');
 
 const cardTemplate = document.querySelector('#card-template').content;
 
@@ -38,3 +40,9 @@ initialCards.forEach (function(cardData) {
   const newCard = createCard(cardData, deleteCard);
   placesList.append(newCard);
 });
+
+editButtonProfile.addEventListener('click', function() {
+  const popupProfileEdit = document.querySelector('.popup_type_edit');
+  popupProfileEdit.style.display = 'block';
+
+  });
