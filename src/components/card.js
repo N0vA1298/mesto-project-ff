@@ -1,10 +1,10 @@
 import { cardLikeCounter } from '../index.js'
 import { openModal, closeModal } from './modal.js';
-import { deleteCardOnServer, cardLikeButtonOn, cardLikeButtonOff, configAPI } from './api.js';
+import { deleteCardOnServer, cardLikeButtonOn, cardLikeButtonOff } from './api.js';
 
 //функция создания карточек
 
-export function createCard(cardData, popupDeleteCard, likeButton, openCardImagePopupOnClick, cardLikeCounter, userData) {
+export function createCard(cardData, deleteCardCallback, likeButton, openCardImagePopupOnClick, cardLikeCounter, userData) {
     const cardTemplate = document.querySelector('#card-template').content;
   
     const cardTemplateContent = cardTemplate.querySelector(".card").cloneNode(true);
@@ -24,28 +24,15 @@ export function createCard(cardData, popupDeleteCard, likeButton, openCardImageP
     return element['_id'] === userData['_id'];
   });
 
-  if(userLikedCard) {
-    cardLikeButton.classList.add('card__like-button_is-active');
-  } else {
-    cardLikeButton.classList.remove('card__like-button_is-active');
-  }
+    cardLikeButton.classList.toggle('card__like-button_is-active', userLikedCard);
   
     const cardId = cardData['_id'];
 
     if(userData['_id'] === cardData.owner['_id']) {
       cardDeleteButton.classList.add('card__delete-button-correct-user');
-
-      cardDeleteButton.addEventListener("click", function () {
-      const popupToConfirmCardDeletion = document.querySelector('.popup_type_card-deletion');
-      openModal(popupToConfirmCardDeletion);
-
-      const cardDeleteButtonConfirm = popupToConfirmCardDeletion.querySelector('.popup__button');
-
-      cardDeleteButtonConfirm.addEventListener('click', () => {
-        popupDeleteCard(cardTemplateContent, cardId);
-        closeModal(popupToConfirmCardDeletion);
+      cardDeleteButton.addEventListener('click', () => {
+        deleteCardCallback(cardTemplateContent, cardId);
       })
-      });
     } else {
       cardDeleteButton.classList.remove('card__delete-button-correct-user');
     }
@@ -59,11 +46,13 @@ export function createCard(cardData, popupDeleteCard, likeButton, openCardImageP
     return cardTemplateContent;
   };
 
-//функция удвления карточек
+//функция удаления карточек
 
 export function deleteCard(elementToDelete, cardId) {
-  elementToDelete.remove();
-    deleteCardOnServer(cardId, configAPI);
+  return deleteCardOnServer(cardId)
+  .then(() => {
+    elementToDelete.remove();
+  })
   };
   
 // функция лайка карточки
@@ -71,18 +60,38 @@ export function deleteCard(elementToDelete, cardId) {
   export function likeButton(evt, cardId, cardElement) {
     if (evt.target.classList.contains('card__like-button')) {
       const likeButton = evt.target;
-      if(!likeButton.classList.contains('card__like-button_is-active')) {
-        likeButton.classList.add('card__like-button_is-active');
-        cardLikeButtonOn(cardId, configAPI)
+      const likeMethod = (cardId) => {
+        return likeButton.classList.contains('card__like-button_is-active') ? cardLikeButtonOff(cardId) : cardLikeButtonOn(cardId)
+      };
+      likeMethod(cardId)
         .then((cardData) => {
+          likeButton.classList.toggle('card__like-button_is-active');
           cardLikeCounter(cardElement, cardData.likes.length);
         })
-      } else {
-        likeButton.classList.remove('card__like-button_is-active');
-        cardLikeButtonOff(cardId, configAPI)
-        .then((cardData) => {
-          cardLikeCounter(cardElement, cardData.likes.length);
+        .catch((err) => {
+          console.log(err);
         });
-      }
     }
   };
+
+  // функция удаления карточки
+
+const popupToConfirmCardDeletion = document.querySelector('.popup_type_card-deletion');
+let cardToDelete, cardToDeleteId;
+export const deleteCardCallback = (card, cardId) => {
+  openModal(popupToConfirmCardDeletion);
+
+  cardToDelete = card;
+  cardToDeleteId = cardId;
+};
+
+const cardDeleteButtonConfirm = popupToConfirmCardDeletion.querySelector('.popup__button');
+cardDeleteButtonConfirm.addEventListener('click', () => {
+  deleteCard(cardToDelete, cardToDeleteId)
+    .then(() => {
+      closeModal(popupToConfirmCardDeletion);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+});

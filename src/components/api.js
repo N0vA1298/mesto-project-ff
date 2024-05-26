@@ -1,6 +1,4 @@
-import { nameInput, jobInput } from "../index.js";
-
-export const configAPI = {
+const configAPI = {
     baseUrl: "https://nomoreparties.co/v1/wff-cohort-13",
     headers: {
     authorization: "fb9f069b-78bb-4d63-8810-b24cf002f635",
@@ -8,157 +6,102 @@ export const configAPI = {
     },
 };
 
+const handleResponse = (res) => {
+    if(res.ok) {
+      return res.json();
+    }
+  
+    return Promise.reject(`Ошибка: ${res.status}`)
+  }
+  
 // получение информации о профиле
 
-export const getUserData = (config) => {
-    return fetch(`${config.baseUrl}/users/me`, {
+export const getUserData = () => {
+    return fetch(`${configAPI.baseUrl}/users/me`, {
       method: "GET",
-      headers: config.headers,
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-
-      return Promise.reject(`Ошибка: ${res.status}`).catch((err) => {
-        console.log(err);
-      });
-    });
+      headers: configAPI.headers,
+    })
+      .then(handleResponse);
   };
 
 // получение информации о карточках с сервера
 
-export const getCardsData = (config) => {
-    return fetch(`${config.baseUrl}/cards`, {
+export const getCardsData = () => {
+    return fetch(`${configAPI.baseUrl}/cards`, {
       method: "GET",
-      headers: config.headers,
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-  
-      return Promise.reject(`Ошибка: ${res.status}`).catch((err) => {
-        console.log(err);
-      });
-    });
+      headers: configAPI.headers,
+    }).then(handleResponse);
   };
 
 // отправка и изменение данных профиля
 
-export const editProfileInfoOnServer = (config) => {
-    return fetch(`${config.baseUrl}/users/me`, {
+export const editProfileInfoOnServer = (nameInput, jobInput) => {
+    return fetch(`${configAPI.baseUrl}/users/me`, {
       method: "PATCH",
-      headers: config.headers,
+      headers: configAPI.headers,
       body: JSON.stringify({
         name: nameInput.value,
         about: jobInput.value,
       }),
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-  
-      return Promise.reject(`Ошибка: ${res.status}`).catch((err) => {
-        console.log(err);
-      });
-    });
+    }).then(handleResponse);
   };
 
 // отправка на сервер данных о новой карточке
 
-export const postNewCard = (popupNameAndUrlData, config) => {
-    return fetch(`${config.baseUrl}/cards`, {
+export const postNewCard = (popupNameAndUrlData) => {
+    return fetch(`${configAPI.baseUrl}/cards`, {
       method: "POST",
-      headers: config.headers,
+      headers: configAPI.headers,
       body: JSON.stringify({
         name: popupNameAndUrlData.name,
         link: popupNameAndUrlData.link,
       }),
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-  
-      return Promise.reject(`Ошибка: ${res.status}`).catch((err) => {
-        console.log(err);
-      });
-    });
+    }).then(handleResponse);
   };
 
 // функция удаления карточки на сервере
 
-export const deleteCardOnServer = (cardId, config) => {
-    return fetch(`${config.baseUrl}/cards/${cardId}`, {
+export const deleteCardOnServer = (cardId) => {
+    return fetch(`${configAPI.baseUrl}/cards/${cardId}`, {
       method: "DELETE",
-      headers: config.headers,
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-  
-      return Promise.reject(`Ошибка: ${res.status}`).catch((err) => {
-        console.log(err);
-      });
-    });
+      headers: configAPI.headers,
+    }).then(handleResponse);
   };
 
 // функция постановки лайка, с отправкой данных на сервер
 
-export const cardLikeButtonOn = (cardId, config) => {
-    return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+export const cardLikeButtonOn = (cardId) => {
+    return fetch(`${configAPI.baseUrl}/cards/likes/${cardId}`, {
       method: "PUT",
-      headers: config.headers,
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-  
-      return Promise.reject(`Ошибка: ${res.status}`).catch((err) => {
-        console.log(err);
-      });
-    });
+      headers: configAPI.headers,
+    }).then(handleResponse);
   };
 
 // функция удаления лайка, с отправкой данных на сервер
 
-export const cardLikeButtonOff = (cardId, config) => {
-    return fetch(`${config.baseUrl}/cards/likes/${cardId}`, {
+export const cardLikeButtonOff = (cardId) => {
+    return fetch(`${configAPI.baseUrl}/cards/likes/${cardId}`, {
       method: "DELETE",
-      headers: config.headers,
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-  
-      return Promise.reject(`Ошибка: ${res.status}`).catch((err) => {
-        console.log(err);
-      });
-    });
+      headers: configAPI.headers,
+    }).then(handleResponse);
   };
 
 // запрос на смену аватара
 
-export const changeAvatarOnServer = (avatarLink, config) => {
-    return fetch(`${config.baseUrl}/users/me/avatar`, {
+export const changeAvatarOnServer = (avatarLink) => {
+    return fetch(`${configAPI.baseUrl}/users/me/avatar`, {
       method: "PATCH",
-      headers: config.headers,
+      headers: configAPI.headers,
       body: JSON.stringify({
         avatar: avatarLink,
       }),
-    }).then((res) => {
-      if (res.ok) {
-        return res.json();
-      }
-  
-      return Promise.reject(`Ошибка: ${res.status}`).catch((err) => {
-        console.log(err);
-      });
-    });
+    }).then(handleResponse);
   };
 
-  export const checkImageUrl = (avatarLink, config) => {
+  export const checkImageUrl = (avatarLink) => {
     return fetch(avatarLink, {
       method: "HEAD",
-      headers: config.headers,
+      headers: configAPI.headers,
     })
       .then((res) => {
         if (res.ok) {

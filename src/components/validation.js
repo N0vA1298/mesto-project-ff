@@ -1,17 +1,15 @@
-import { validationConfig } from "../index.js";
-
 // функция обработчик всех инпутов формы
 
 function setEventListeners(formElement, validationConfig) {
   const inputList = Array.from(formElement.querySelectorAll(validationConfig.inputSelector));
   const buttonElement = formElement.querySelector(validationConfig.submitButtonSelector);
 
-  buttonCurrentState(inputList, buttonElement, validationConfig);
+  togglePopupButtonState(inputList, buttonElement, validationConfig);
 
   inputList.forEach((inputElement) => {
     inputElement.addEventListener("input", () => {
-      checkInputValidation(formElement, inputElement);
-      buttonCurrentState(inputList, buttonElement, validationConfig);
+        checkInputValidation(formElement, inputElement, validationConfig);
+        togglePopupButtonState(inputList, buttonElement, validationConfig);
     });
   });
 };
@@ -33,7 +31,7 @@ export function enableValidation(validationConfig) {
 
 // функция показа ошибки у инпута формы
 
-function showPopupInputError(formElement, inputElement, errorMessage) {
+function showPopupInputError(formElement, inputElement, errorMessage, validationConfig) {
   const formInputError = formElement.querySelector(`.${inputElement.id}-error`);
   formInputError.textContent = errorMessage;
   formInputError.classList.add(validationConfig.errorClass);
@@ -51,7 +49,7 @@ function hidePopupInputError(formElement, inputElement, validationConfig) {
 
 // функция валидации инпута
 
-function checkInputValidation(formElement, inputElement) {
+function checkInputValidation(formElement, inputElement, validationConfig) {
   if (inputElement.validity.patternMismatch) {
     inputElement.setCustomValidity(inputElement.dataset.errorMessage);
   } else {
@@ -62,7 +60,8 @@ function checkInputValidation(formElement, inputElement) {
     showPopupInputError(
       formElement,
       inputElement,
-      inputElement.validationMessage
+      inputElement.validationMessage,
+      validationConfig
     );
   } else {
     hidePopupInputError(formElement, inputElement, validationConfig);
@@ -79,7 +78,7 @@ function invalidInput(inputList) {
 
 // функция переключения кнопки в активную или наоборот
 
-function buttonCurrentState(inputList, buttonElement, validationConfig) {
+function togglePopupButtonState(inputList, buttonElement, validationConfig) {
   if (invalidInput(inputList)) {
     buttonElement.setAttribute("disabled", "");
     buttonElement.classList.add(validationConfig.inactiveButtonClass);
@@ -105,5 +104,6 @@ export function clearValidation(formElement, validationConfig) {
   const inputList = Array.from(
     formElement.querySelectorAll(validationConfig.inputSelector)
   );
-  buttonCurrentState(inputList, buttonElement, validationConfig);
+  formElement.reset();
+  togglePopupButtonState(inputList, buttonElement, validationConfig);
 };
