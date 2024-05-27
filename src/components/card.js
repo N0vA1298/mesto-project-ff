@@ -1,4 +1,3 @@
-import { cardLikeCounter } from '../index.js'
 import { openModal, closeModal } from './modal.js';
 import { deleteCardOnServer, cardLikeButtonOn, cardLikeButtonOff } from './api.js';
 
@@ -48,11 +47,8 @@ export function createCard(cardData, deleteCardCallback, likeButton, openCardIma
 
 //функция удаления карточек
 
-export function deleteCard(elementToDelete, cardId) {
-  return deleteCardOnServer(cardId)
-  .then(() => {
+export function deleteCard(elementToDelete) {
     elementToDelete.remove();
-  })
   };
   
 // функция лайка карточки
@@ -74,24 +70,17 @@ export function deleteCard(elementToDelete, cardId) {
     }
   };
 
-  // функция удаления карточки
 
-const popupToConfirmCardDeletion = document.querySelector('.popup_type_card-deletion');
-let cardToDelete, cardToDeleteId;
-export const deleteCardCallback = (card, cardId) => {
-  openModal(popupToConfirmCardDeletion);
+  // функция - счетчик количества лайков на карточке
 
-  cardToDelete = card;
-  cardToDeleteId = cardId;
-};
+export function cardLikeCounter(cardElement, amountOfLikes) {
+  const cardLikeCount = cardElement.querySelector('.card__like-counter');
 
-const cardDeleteButtonConfirm = popupToConfirmCardDeletion.querySelector('.popup__button');
-cardDeleteButtonConfirm.addEventListener('click', () => {
-  deleteCard(cardToDelete, cardToDeleteId)
-    .then(() => {
-      closeModal(popupToConfirmCardDeletion);
-    })
-    .catch((err) => {
-      console.log(err);
-    })
-});
+  if(amountOfLikes > 0) {
+    cardLikeCount.classList.add('card__like-counter-active');
+    cardLikeCount.textContent = amountOfLikes;
+  } else {
+    cardLikeCount.classList.remove('card__like-counter-active');
+    cardLikeCount.textContent = '';
+  }
+}

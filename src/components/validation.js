@@ -104,6 +104,5 @@ export function clearValidation(formElement, validationConfig) {
   const inputList = Array.from(
     formElement.querySelectorAll(validationConfig.inputSelector)
   );
-  formElement.reset();
   togglePopupButtonState(inputList, buttonElement, validationConfig);
 };

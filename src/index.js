@@ -1,20 +1,23 @@
 import "./pages/index.css";
-import { createCard, deleteCard, likeButton, deleteCardCallback } from "./components/card.js";
+import { createCard, deleteCard, likeButton} from "./components/card.js";
 import { openModal, closeModal } from "./components/modal.js";
 import { enableValidation, clearValidation } from "./components/validation.js";
 import { getUserData, getCardsData, editProfileInfoOnServer, postNewCard, changeAvatarOnServer, checkImageUrl } from './components/api.js';
+import { deleteCardOnServer, cardLikeButtonOn, cardLikeButtonOff } from './components/api.js';
+import { cardLikeCounter } from './components/card.js'
 
 
 const cardsContainer = document.querySelector('.places__list');
 const buttonOpenPopupProfile = document.querySelector('.profile__edit-button');
 const popupProfileEdit = document.querySelector('.popup_type_edit');
-const addNewCardButton = document.querySelector('.profile__add-button');
+const buttonAddNewCard = document.querySelector('.profile__add-button');
 const popupNewCard = document.querySelector('.popup_type_new-card');
 const popupTypeImage = document.querySelector('.popup_type_image');
 const popupInputCardName = popupNewCard.querySelector('.popup__input_type_card-name');
 const popupInputCardUrl = popupNewCard.querySelector('.popup__input_type_url');
 const popupImage = document.querySelector('.popup__image');
 const popupCaption = document.querySelector('.popup__caption');
+const popupNewCardForm = popupNewCard.querySelector('.popup__form');
 
 const validationConfig = {
   formSelector: ".popup__form",
@@ -32,7 +35,7 @@ buttonOpenPopupProfile.addEventListener('click', function() {
   clearValidation(popupProfileEdit.querySelector(validationConfig.formSelector), validationConfig);
 });
 
-addNewCardButton.addEventListener('click', function() {
+buttonAddNewCard.addEventListener('click', function() {
   openModal(popupNewCard);
   clearValidation(popupNewCard.querySelector(validationConfig.formSelector), validationConfig);
 });
@@ -75,7 +78,6 @@ function editProfileInfo(evt) {
   })
   .finally(() => {
     popupProfileEditSubmitButton.textContent = 'Сохранить';
-    closeModal(popupProfileEdit);
   });
 }
 
@@ -94,8 +96,6 @@ let currentUserData;
 
 function addNewCard(evt) {
   evt.preventDefault();
-
-  const popupNewCardForm = popupNewCard.querySelector('.popup__form');
 
   const popupAddNewCardSubmitButton = popupNewCardForm.querySelector('.popup__button');
   popupAddNewCardSubmitButton.textContent = 'Сохранение...';
@@ -194,26 +194,14 @@ Promise.all([getUserData(), getCardsData()])
     console.log(err);
   });
 
-// функция - счетчик количества лайков на карточке
-
-export function cardLikeCounter(cardElement, amountOfLikes) {
-  const cardLikeCount = cardElement.querySelector('.card__like-counter');
-
-  if(amountOfLikes > 0) {
-    cardLikeCount.classList.add('card__like-counter-active');
-    cardLikeCount.textContent = amountOfLikes;
-  } else {
-    cardLikeCount.classList.remove('card__like-counter-active');
-    cardLikeCount.textContent = '';
-  }
-}
-
 // функция смены аватара
 
 const formEditAvatar = popupEditAvatar.querySelector('.popup__form');
+const popupAvatarInput = formEditAvatar.querySelector('.popup__input_type_url');
+const popupAvatarButton = formEditAvatar.querySelector('.popup__button');
+
 function changeAvatar() {
-  const popupAvatarInput = formEditAvatar.querySelector('.popup__input_type_url');
-  const popupAvatarButton = formEditAvatar.querySelector('.popup__button');
+
   formEditAvatar.textContent = 'Сохранение...';
 
   profileImage.style.backgroundImage = `url('${popupAvatarInput.value}')`;
@@ -237,3 +225,26 @@ formEditAvatar.addEventListener('submit', (evt) => {
   evt.preventDefault();
   changeAvatar();
 });
+
+  // функция удаления карточки
+
+  const popupToConfirmCardDeletion = document.querySelector('.popup_type_card-deletion');
+  let cardToDelete, cardToDeleteId;
+   const deleteCardCallback = (card, cardId) => {
+    openModal(popupToConfirmCardDeletion);
+  
+    cardToDelete = card;
+    cardToDeleteId = cardId;
+  };
+  
+  const cardDeleteButtonConfirm = popupToConfirmCardDeletion.querySelector('.popup__button');
+  cardDeleteButtonConfirm.addEventListener('click', () => {
+    try{
+    deleteCardOnServer(cardToDeleteId);
+    deleteCard(cardToDelete);
+    closeModal(popupToConfirmCardDeletion);
+    }
+      catch(err) {
+        console.log(err);
+      }
+    });
