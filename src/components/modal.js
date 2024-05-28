@@ -46,35 +46,3 @@ export function openModal(element) {
       closeModal(evt.target);
     }
   }
-
-
-// добавляем функцию для обработки отправки формы
-
-  async function handleFormSubmit(event) {
-    event.preventDefault();
-    const form = event.target;
-    const formData = new FormData(form);
-
-    try {
-        const response = await fetch(form.action, {
-            method: form.method,
-            body: formData,
-        });
-
-        if (response.ok) {
-            const popup = form.closest('.popup');
-            if (popup) {
-                closeModal(popup);
-            }
-        } else {
-            console.error('Form submission failed', response.statusText);
-        }
-    } catch (error) {
-        console.error('Form submission error', error);
-    }
-}
-
-// привязываем обработчик к формам
-document.querySelectorAll('form').forEach(form => {
-    form.addEventListener('submit', handleFormSubmit);
-});
