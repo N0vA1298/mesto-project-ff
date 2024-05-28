@@ -19,6 +19,8 @@ const popupImage = document.querySelector('.popup__image');
 const popupCaption = document.querySelector('.popup__caption');
 const popupNewCardForm = popupNewCard.querySelector('.popup__form');
 
+const popupAddNewCardSubmitButton = popupNewCardForm.querySelector('.popup__button');
+
 const validationConfig = {
   formSelector: ".popup__form",
   inputSelector: ".popup__input",
@@ -96,14 +98,8 @@ let currentUserData;
 
 function addNewCard(evt) {
   evt.preventDefault();
-
-  const popupAddNewCardSubmitButton = popupNewCardForm.querySelector('.popup__button');
+  
   popupAddNewCardSubmitButton.textContent = 'Сохранение...';
-
-  const popupInputCardName = popupNewCardForm.querySelector(".popup__input_type_card-name");
-  const popupInputCardUrl = popupNewCardForm.querySelector(
-    ".popup__input_type_url"
-  );
 
   const newCardData = {
     name: popupInputCardName.value,
@@ -118,7 +114,7 @@ function addNewCard(evt) {
       likeButton,
       openImagePopup,
       cardLikeCounter,
-      currentUserData
+      currentUserData.userId
     );
   })
   .then((res) => {
@@ -212,12 +208,14 @@ function changeAvatar() {
     .then(() => {
       return changeAvatarOnServer(avatarLink);
     })
+    .then(() => {
+      closeModal(popupEditAvatar);
+    })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
       popupAvatarButton.textContent = 'Сохранить';
-      closeModal(popupEditAvatar);
     })
 };
 
@@ -240,11 +238,12 @@ formEditAvatar.addEventListener('submit', (evt) => {
   const cardDeleteButtonConfirm = popupToConfirmCardDeletion.querySelector('.popup__button');
   cardDeleteButtonConfirm.addEventListener('click', () => {
     try{
-    deleteCardOnServer(cardToDeleteId);
-    deleteCard(cardToDelete);
-    closeModal(popupToConfirmCardDeletion);
-    }
-      catch(err) {
+    deleteCardOnServer(cardToDeleteId)
+    .then(() => {
+      deleteCard(cardToDelete);
+      closeModal(popupToConfirmCardDeletion);
+    })
+    } catch(err) {
         console.log(err);
       }
     });
