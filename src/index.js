@@ -32,7 +32,9 @@ const validationConfig = {
 // функция для обработки отправки формы
 function handleFormSubmit(evt, submitButton, apiFunction, onSuccess) {
   evt.preventDefault();
+  submitButton.classList.add('popup__button-disabled');
   submitButton.textContent = 'Сохранение...';
+  submitButton.disabled = true;
 
   apiFunction()
     .then(onSuccess)
@@ -40,6 +42,8 @@ function handleFormSubmit(evt, submitButton, apiFunction, onSuccess) {
       console.log(err);
     })
     .finally(() => {
+      submitButton.classList.remove('popup__button-disabled');
+      submitButton.disabled = false;
       submitButton.textContent = 'Сохранить';
     });
 }
@@ -139,16 +143,10 @@ enableValidation(validationConfig);
 // установка данных пользователя в профиль
 const profileImage = document.querySelector(".profile__image");
 
-function setProfileUserData() {
-  getUserData()
-    .then((userData) => {
-      profileImage.style.backgroundImage = `url('${userData.avatar}')`;
-      profileTitle.textContent = userData.name;
-      profileDescription.textContent = userData.about;
-    })
-    .catch((err) => {
-    console.log(err);
-    });
+function setProfileUserData(userData) {
+  profileImage.style.backgroundImage = `url('${userData.avatar}')`;
+  profileTitle.textContent = userData.name;
+  profileDescription.textContent = userData.about;
 }
 
 const popupEditAvatar = document.querySelector('.popup_type_edit_avatar');
@@ -160,10 +158,11 @@ profileImage.addEventListener('click', () => {
 Promise.all([getUserData(), getCardsData()])
   .then(([userData, cardsData]) => {
     currentUserData = userData;
-    setProfileUserData();
+
+    setProfileUserData(userData);
 
     cardsData.forEach((cardData) => {
-      cardsContainer.append(createCard(cardData, deleteCardCallback, likeButton, openImagePopup, cardLikeCounter, currentUserData._id));
+      cardsContainer.append(createCard(cardData, deleteCardCallback, likeButton, openImagePopup, cardLikeCounter, currentUserData));
     });
   })
   .catch((err) => {

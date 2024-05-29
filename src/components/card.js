@@ -1,49 +1,47 @@
-import { openModal, closeModal } from './modal.js';
 import { deleteCardOnServer, cardLikeButtonOn, cardLikeButtonOff } from './api.js';
 
 //функция создания карточек
 
 export function createCard(cardData, deleteCardCallback, likeButton, openCardImagePopupOnClick, cardLikeCounter, userData) {
-    const cardTemplate = document.querySelector('#card-template').content;
-  
-    const cardTemplateContent = cardTemplate.querySelector(".card").cloneNode(true);
-  
-    const cardImage = cardTemplateContent.querySelector(".card__image");
-    const cardTitle = cardTemplateContent.querySelector(".card__title");
-    const cardDeleteButton = cardTemplateContent.querySelector(".card__delete-button");
-    const cardLikeButton =cardTemplateContent.querySelector(".card__like-button");
-  
-    cardImage.src = cardData.link;
-    cardImage.alt = cardData.name;
-    cardTitle.textContent = cardData.name;
+  const cardTemplate = document.querySelector('#card-template').content;
+  const cardTemplateContent = cardTemplate.querySelector(".card").cloneNode(true);
 
-    cardLikeCounter(cardTemplateContent, cardData.likes.length);
+  const cardImage = cardTemplateContent.querySelector(".card__image");
+  const cardTitle = cardTemplateContent.querySelector(".card__title");
+  const cardDeleteButton = cardTemplateContent.querySelector(".card__delete-button");
+  const cardLikeButton = cardTemplateContent.querySelector(".card__like-button");
 
-      const userLikedCard = cardData.likes.some((element) => {
+  cardImage.src = cardData.link;
+  cardImage.alt = cardData.name;
+  cardTitle.textContent = cardData.name;
+
+  cardLikeCounter(cardTemplateContent, cardData.likes.length);
+
+  const userLikedCard = cardData.likes.some((element) => {
     return element['_id'] === userData['_id'];
   });
 
-    cardLikeButton.classList.toggle('card__like-button_is-active', userLikedCard);
-  
-    const cardId = cardData['_id'];
+  cardLikeButton.classList.toggle('card__like-button_is-active', userLikedCard);
 
-    if(userData['_id'] === cardData.owner['_id']) {
-      cardDeleteButton.classList.add('card__delete-button-correct-user');
-      cardDeleteButton.addEventListener('click', () => {
-        deleteCardCallback(cardTemplateContent, cardId);
-      })
-    } else {
-      cardDeleteButton.classList.remove('card__delete-button-correct-user');
-    }
-  
-    cardLikeButton.addEventListener("click", (evt) => {
-      likeButton(evt, cardId, cardTemplateContent);
+  const cardId = cardData['_id'];
+
+  if (userData['_id'] === cardData.owner['_id']) {
+    cardDeleteButton.classList.add('card__delete-button_visible');
+    cardDeleteButton.addEventListener('click', () => {
+      deleteCardCallback(cardTemplateContent, cardId);
     });
-  
-    cardImage.addEventListener("click", openCardImagePopupOnClick);
-  
-    return cardTemplateContent;
-  };
+  } else {
+    console.log('User is not the owner of the card with id:', cardId);
+  }
+
+  cardLikeButton.addEventListener("click", (evt) => {
+    likeButton(evt, cardId, cardTemplateContent);
+  });
+
+  cardImage.addEventListener("click", openCardImagePopupOnClick);
+
+  return cardTemplateContent;
+}
 
 //функция удаления карточек
 

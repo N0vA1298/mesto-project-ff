@@ -1,3 +1,7 @@
 .card__delete-button-correct-user {
     display: block;
 }
+
+.card__delete-button_visible {
+    display: block;
+  }
