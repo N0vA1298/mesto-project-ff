@@ -2,7 +2,7 @@ import { deleteCardOnServer, cardLikeButtonOn, cardLikeButtonOff } from './api.j
 
 //функция создания карточек
 
-export function createCard(cardData, deleteCardCallback, likeButton, openCardImagePopupOnClick, cardLikeCounter, userData) {
+export function createCard(cardData, deleteCardCallback, likeButton, openCardImagePopupOnClick, cardLikeCounter, userId) {
   const cardTemplate = document.querySelector('#card-template').content;
   const cardTemplateContent = cardTemplate.querySelector(".card").cloneNode(true);
 
@@ -18,14 +18,17 @@ export function createCard(cardData, deleteCardCallback, likeButton, openCardIma
   cardLikeCounter(cardTemplateContent, cardData.likes.length);
 
   const userLikedCard = cardData.likes.some((element) => {
-    return element['_id'] === userData['_id'];
+    return element['_id'] === userId;
   });
 
   cardLikeButton.classList.toggle('card__like-button_is-active', userLikedCard);
 
   const cardId = cardData['_id'];
 
-  if (userData['_id'] === cardData.owner['_id']) {
+  console.log('Current user ID:', userId);
+  console.log('Card owner ID:', cardData.owner['_id']);
+
+  if (userId === cardData.owner['_id']) {
     cardDeleteButton.classList.add('card__delete-button_visible');
     cardDeleteButton.addEventListener('click', () => {
       deleteCardCallback(cardTemplateContent, cardId);
@@ -42,7 +45,6 @@ export function createCard(cardData, deleteCardCallback, likeButton, openCardIma
 
   return cardTemplateContent;
 }
-
 //функция удаления карточек
 
 export function deleteCard(elementToDelete) {
