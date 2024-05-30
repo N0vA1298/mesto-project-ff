@@ -106,6 +106,8 @@ function addNewCard(evt) {
   handleFormSubmit(evt, popupAddNewCardSubmitButton, () => postNewCard(newCardData), (cardData) => {
     cardsContainer.prepend(createCard(cardData, deleteCardCallback, likeButton, openImagePopup, cardLikeCounter, currentUserData._id));
     closeModal(popupNewCard);
+    popupNewCardForm.reset(); 
+    clearValidation(popupNewCardForm, validationConfig);
   });
 }
 
@@ -164,6 +166,8 @@ function changeAvatar(evt) {
   handleFormSubmit(evt, popupAvatarButton, () => changeAvatarOnServer(popupAvatarInput.value), (data) => {
     profileImage.style.backgroundImage = `url('${data.avatar}')`;
     closeModal(popupEditAvatar);
+    formEditAvatar.reset();
+    clearValidation(formEditAvatar, validationConfig);
   });
 }
 
